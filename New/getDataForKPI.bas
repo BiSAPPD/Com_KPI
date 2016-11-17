@@ -10,8 +10,7 @@ Dim ShOutCntct As String
 Dim clnts As clsClients, clnt As clsClientInfo
 Set clnts = New clsClients
 
-Dim users As clsUsers, user As clsUser
-Set usrs = New clsUsers
+Set dic_People = CreateObject("Scripting.Dictionary"): dic_People.RemoveAll
 
 nm_ActWb = ActiveWorkbook.Name
 cd_ActualMonth = CInt(InputBox("Month"))
@@ -31,10 +30,16 @@ For f_mnth = 1 To cd_ActualMonth
         WbTR = myLib.OpenFile(patch, ShOutCntct)
         Workbooks(WbTR).Activate
         
+
+
+
+
+
+
         ShOutCntc = "Cnt_Persone"
-        
         Sheets(ShOutCntct).Select
-        usrs.FillFromSheet ActiveSheet, cd_ActualYear, f_mnth, nm_brand
+
+
         
         Workbooks(WbTR).Activate
         ShOut = nm_brand

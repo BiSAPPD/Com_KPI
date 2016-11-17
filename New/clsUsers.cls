@@ -10,15 +10,21 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private dic_People As Object
+Private dic_People As Dictionary
 
 Private Sub Class_Initialize()
-    Set dic_People = CreateObject("Scripting.Dictionary")
+    Set dic_People = New Dictionary
 End Sub
 
 Private Sub Class_Terminate()
     Set dic_People = Nothing
 End Sub
+
+Public Property Get NewEnum() As IUnknown
+Attribute NewEnum.VB_UserMemId = -4
+Attribute NewEnum.VB_MemberFlags = "40"
+    Set NewEnum = dic_People.[_NewEnum]
+End Property
 
 
 Public Sub Add(key As Variant, obj As clsUser)
