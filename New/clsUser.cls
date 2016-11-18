@@ -11,9 +11,11 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public cdDateStat As Date
+Public brandStat As String
 Public PersonName As String
+Public Shef As String
 Public Role As String
-Public Status As String
+Public status As String
 Public Mobile As String
 Public Mail As String
 Public Partner As String

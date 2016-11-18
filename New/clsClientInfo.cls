@@ -9,8 +9,8 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public StatYear As Integer
-Public StatMonth As Integer
+Public key_srep As String
+Public cdDateStat As Date
 Public BrandName As String
 Public TypeBusiness As String
 Public DatabaseClientNum As Integer
@@ -68,29 +68,28 @@ Public HairdressersNum As Variant
 Public HairdressersWorkPlace As Integer
 Public PartnerName As String
 Public PartnerCode As Variant
-Public isLost as Integrer
 
 Public CA_TY_M As Collection
 Public CA_PY_M As Collection
 Public CA_TY_YTD As Collection
 Public CA_PY_YTD As Collection
 
-Public DN_TY_M As Collection
-Public DN_PY_M As Collection
-Public DN_TY_YTD As Collection
-Public DN_PY_YTD As Collection
+
 
 Private Sub Class_Initialize()
-  Set CA_TY_M = New Collection
-  Set CA_PY_M = New Collection
-  Set CA_TY_YTD = New Collection
-  Set CA_PY_YTD = New Collection
-
-  Set DN_TY_M = New Collection
-  Set DN_PY_M = New Collection
-  Set DN_TY_YTD = New Collection
-  Set DN_PY_YTD = New Collection
+   Set CA_TY_M = New Collection
+   Set CA_PY_M = New Collection
+   Set CA_TY_YTD = New Collection
+   Set CA_PY_YTD = New Collection
 End Sub
 
-
+Public Function getSumCA(col As Collection, startMonth As Integer, endMonth As Integer) As Long
+   Dim i As Integer
+   Dim result As Long
+   result = 0
+   For i = startMonth To endMonth
+       result = result + col.Item(i)
+   Next i
+   getSumCA = result
+End Function
 

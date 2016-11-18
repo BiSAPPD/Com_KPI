@@ -53,20 +53,34 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     Const clmTYLor = 93
     Const clmPYLor = 106
   
-    Dim f_i As Long, end_f As Long, obj As clsClientInfo, n As Long, cumulTY As Double, cumulPY As Double
-
+    Dim f_i As Long, end_f As Long, obj As clsClientInfo, n As Long, cumulTY As Double, cumulPY As Double, sv As Integer
     
+    Dim prg As Integer
+       
+    Dim diag As New ProgressDialogue
     
     end_f = myLib.GetLastRow
-    For f_i = cFirstRow To myLib.GetLastRow
-    Application.StatusBar = cBrand & " Year: " & cStatYear & " Month: " & cStatMonth & " Progress: " & f_i & " of " & end_f & ": " & Format(f_i / end_f, "0%"): DoEvents
-
-
+     
+    diag.Configure "Upload data", "Now wasting your time...", cFirstRow, end_f
+    diag.Show
+    
+    
+    
+    For f_i = cFirstRow To end_f
+        sv = sv + 1
+        If sv = 500 Then
+            diag.SetValue f_i
+            diag.SetStatus wks.name & " " & cStatYear & " " & cStatMonth & " from " & f_i & " to " & end_f
+            sv = 0
+        End If
+        If diag.cancelIsPressed Then Exit For
+    
+  
 
         Set obj = New clsClientInfo
         With obj
-            .StatYear = cStatYear
-            .StatMonth = cStatMonth
+            
+            .cdDateStat = DateSerial(cStatYear, cStatMonth, 1)
             .BrandName = cBrand
             .TypeBusiness = myLib.GetTypeBusiness(cBrand)
             .DatabaseClientNum = wks.Cells(f_i, 1)
@@ -122,29 +136,39 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .MastersEducatedAllY = myLib.GetNum2numNull(wks.Cells(f_i, 30))
             .MastersEducatedPY = myLib.GetNum2numNull(wks.Cells(f_i, 31))
             .MastersEducatedTY = myLib.GetNum2numNull(wks.Cells(f_i, 32))
-            .IsLost = IFF(.LtmAvgCaVal = 0 , 1 , Empty)
+            .key_srep = .BrandName & .cdDateStat & .SrepName
+            
+            
            
             cumulTY = Empty
             cumulPY = Empty
             For n = 1 To 12
+           
                 .CA_TY_M.Add IIf(cStatMonth >= n, CLng(wks.Cells(f_i, clmTYLor + n - 1)), Empty), CStr(n)
                 .CA_PY_M.Add IIf(cStatMonth >= 1, CLng(wks.Cells(f_i, clmPYLor + n - 1)), Empty), CStr(n)
                     cumulTY = cumulTY + .CA_TY_M.Item(n)
                     cumulPY = cumulPY + .CA_PY_M.Item(n)
                 .CA_TY_YTD.Add IIf(cStatMonth >= n, cumulTY, Empty), CStr(n)
                 .CA_PY_YTD.Add IIf(cStatMonth >= 1, cumulPY, Empty), CStr(n)
+                                
             Next n
-            
-            For n = 1 to 12
-                
-            
-
-
+        
         End With
         
         Me.Add obj
     Next
-End Sub
+    diag.Hide
+    End Sub
 
+    Public Function FilterByKeyRep(str As String) As clsClients
+    Dim clnts As clsClients, clnt As clsClientInfo
+    Set clnts = New clsClients
 
+    For Each clnt In Me
+        If clnt.key_srep = str Then clnts.Add clnt
+    Next
+
+    Set FilterByKeyRep = clnts
+
+    End Function
 

@@ -10,7 +10,7 @@ Attribute VB_Exposed = False
 
 Option Explicit
 
-Private dic_People As Dictionary
+Public dic_People As Dictionary
 
 Private Sub Class_Initialize()
     Set dic_People = New Dictionary
@@ -37,25 +37,32 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
   
     Dim f_rw As Long, end_f As Long, obj As clsUser, n As Long, cumulTY As Double, cumulPY As Double, nm_Srep As String
     Dim keyUser As String, nm_FLSM As String, nm_vacancy_status As String
-      
+    Dim prg As Integer
+    
             
     end_f = myLib.GetLastRow
     For f_rw = cFirstRow To end_f
-    Application.StatusBar = cBrand & " Year: " & cStatYear & " Month: " & cStatMonth & " Progress: " & f_rw & " of " & end_f & ": " & Format(f_rw / end_f, "0%"): DoEvents
-
-    nm_Srep = Trim(wks.Cells(f_rw, cSrep))
-    nm_FLSM = Trim(Cells(f_rw, cFLSM))
-    nm_vacancy_status = myLib.GetSREP_type(nm_Srep, nm_FLSM)
     
-    keyUser = cStatYear & cStatMonth & cBrand & nm_Srep
-    
-    If Not dic_People.Exists(keyUser) Then
-        Set obj = New clsUser
-        With obj
-            .PersonName = nm_Srep
-        End With
-        Me.Add keyUser, obj
-    End If
+        
+        nm_Srep = Trim(wks.Cells(f_rw, cSrep))
+        nm_FLSM = Trim(Cells(f_rw, cFLSM))
+        nm_vacancy_status = myLib.GetSREP_type(nm_Srep, nm_FLSM)
+        
+        keyUser = cStatYear & cStatMonth & cBrand & nm_Srep
+        
+        If Not dic_People.Exists(keyUser) And Len(nm_Srep) > 0 Then
+            Set obj = New clsUser
+            With obj
+                .cdDateStat = DateSerial(cStatYear, cStatMonth, 1)
+                .PersonName = nm_Srep
+                .Shef = nm_FLSM
+                .status = nm_vacancy_status
+                .brandStat = cBrand
+                
+                                
+            End With
+            Me.Add keyUser, obj
+        End If
     Next
 End Sub
 
