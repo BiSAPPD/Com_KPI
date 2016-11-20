@@ -33,7 +33,7 @@ End Sub
 
 Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByVal cStatMonth As Integer, ByVal cBrand As String)
     Const cFirstRow = 2
-    Const cSrep = 3, cFLSM = 6
+    Const cSrep = 3, cFlsm = 6
   
     Dim f_rw As Long, end_f As Long, obj As clsUser, n As Long, cumulTY As Double, cumulPY As Double, nm_Srep As String
     Dim keyUser As String, nm_FLSM As String, nm_vacancy_status As String
@@ -45,7 +45,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     
         
         nm_Srep = Trim(wks.Cells(f_rw, cSrep))
-        nm_FLSM = Trim(Cells(f_rw, cFLSM))
+        nm_FLSM = Trim(Cells(f_rw, cFlsm))
         nm_vacancy_status = myLib.GetSREP_type(nm_Srep, nm_FLSM)
         
         keyUser = cStatYear & cStatMonth & cBrand & nm_Srep
@@ -55,9 +55,9 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             With obj
                 .cdDateStat = DateSerial(cStatYear, cStatMonth, 1)
                 .PersonName = nm_Srep
-                .Shef = nm_FLSM
+                .shef = nm_FLSM
                 .status = nm_vacancy_status
-                .brandStat = cBrand
+                .BrandStat = cBrand
                 
                                 
             End With

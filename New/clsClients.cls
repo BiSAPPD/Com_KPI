@@ -26,7 +26,7 @@ Attribute NewEnum.VB_MemberFlags = "40"
     Set NewEnum = colClients.[_NewEnum]
 End Property
 
-Public Sub Add(obj As clsClientInfo)
+Public Sub Add(obj As clsClient)
     colClients.Add obj
 End Sub
 
@@ -34,7 +34,7 @@ Public Sub Remove(Index As Variant)
     colClients.Remove Index
 End Sub
 
-Public Property Get Item(Index As Variant) As clsClientInfo
+Public Property Get Item(Index As Variant) As clsClient
 Attribute Item.VB_UserMemId = 0
     Set Item = colClients.Item(Index)
 End Property
@@ -53,10 +53,10 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     Const clmTYLor = 93
     Const clmPYLor = 106
   
-    Dim f_i As Long, end_f As Long, obj As clsClientInfo, n As Long, cumulTY As Double, cumulPY As Double, sv As Integer
+    Dim f_i As Long, end_f As Long, obj As clsClient, n As Long, cumulTY As Double, cumulPY As Double, sv As Integer
     
-    Dim prg As Integer
-       
+    Dim prg As Integer, statusKPI As Boolean
+           
     Dim diag As New ProgressDialogue
     
     end_f = myLib.GetLastRow
@@ -64,7 +64,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     diag.Configure "Upload data", "Now wasting your time...", cFirstRow, end_f
     diag.Show
     
-    
+    statusKPI = IIF(wks.Cells(2, 33) = "KPI", True, False)
     
     For f_i = cFirstRow To end_f
         sv = sv + 1
@@ -75,9 +75,9 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
         End If
         If diag.cancelIsPressed Then Exit For
     
-  
+        
 
-        Set obj = New clsClientInfo
+        Set obj = New clsClient
         With obj
             
             .cdDateStat = DateSerial(cStatYear, cStatMonth, 1)
@@ -99,7 +99,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .ClientName = myLib.GetClientName(.Client, .ClientAddres, .GeoCity)
             .ChainName = wks.Cells(f_i, 19)
             .ChainCode = myLib.GetNum2numNull(Cells(f_i, 20))
-            .ChainNameTop = IIf(Left(.ChainCode, 2) = "93", .ChainName, Empty)
+            .ChainNameTop = IIF(Left(.ChainCode, 2) = "93", .ChainName, Empty)
             .GeoReg = wks.Cells(f_i, 13)
             .ClientType = wks.Cells(f_i, 18)
             .ClientTypeRus = myLib.GetClntType(.ClientType, 1)
@@ -111,17 +111,17 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .EmotionStatus = Empty
             .CnqYearDate = myLib.GetYearType(cStatYear, myLib.GetNum2num0(wks.Cells(f_i, 65)), 1)
             .CnqYearGA = myLib.GetYearType(cStatYear, myLib.GetNum2num0(wks.Cells(f_i, 65)), 3)
-            .CnqFullDate = DateSerial(.CnqYearDate, .CnqMonthNum, 1)
             .CnqMonthNameRus = wks.Cells(f_i, 64)
             .CnqMonthNum = myLib.GetMonthNumeric(.CnqMonthNameRus)
             .CnqMonthNameEng = myLib.GetNameMonthEN(.CnqMonthNum)
+            .CnqFullDate = DateSerial(.CnqYearDate, .CnqMonthNum, 1)
             .MagMinPrice = myLib.GetNum2num0(wks.Cells(f_i, 23))
             .MagMaxPrice = myLib.GetNum2num0(wks.Cells(f_i, 25))
             .HairDressersPlaces = myLib.GetNum2num0(wks.Cells(f_i, 27))
             .MagTypePrice = myLib.GetMag(.MagMinPrice, .MagMaxPrice, .HairDressersPlaces, .TypeBusiness)
             .MagTypePlace = myLib.GetMag(.MagMinPrice, .MagMaxPrice, .HairDressersPlaces, "place")
             .Mag = .MagTypePrice & .MagTypePlace
-            .MagType = IIf(Len(.Mag) = 2, .Mag, Empty)
+            .MagType = IIF(Len(.Mag) = 2, .Mag, Empty)
             .WorkStatusNum = wks.Cells(f_i, 8)
             .WorkStatusName = myLib.GetTypeDN(.WorkStatusNum)
             .ClientEcadCode = wks.Cells(f_i, 29)
@@ -138,18 +138,22 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .MastersEducatedTY = myLib.GetNum2numNull(wks.Cells(f_i, 32))
             .key_srep = .BrandName & .cdDateStat & .SrepName
             
+            .OrdersSLN = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 33), 0))
+            .OrdersPhone = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 34), 0))
+            .Visits2Act = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 35), 0))
+ 
             
            
             cumulTY = Empty
             cumulPY = Empty
             For n = 1 To 12
            
-                .CA_TY_M.Add IIf(cStatMonth >= n, CLng(wks.Cells(f_i, clmTYLor + n - 1)), Empty), CStr(n)
-                .CA_PY_M.Add IIf(cStatMonth >= 1, CLng(wks.Cells(f_i, clmPYLor + n - 1)), Empty), CStr(n)
+                .CA_TY_M.Add IIF(cStatMonth >= n, CLng(wks.Cells(f_i, clmTYLor + n - 1)), Empty), CStr(n)
+                .CA_PY_M.Add IIF(cStatMonth >= 1, CLng(wks.Cells(f_i, clmPYLor + n - 1)), Empty), CStr(n)
                     cumulTY = cumulTY + .CA_TY_M.Item(n)
                     cumulPY = cumulPY + .CA_PY_M.Item(n)
-                .CA_TY_YTD.Add IIf(cStatMonth >= n, cumulTY, Empty), CStr(n)
-                .CA_PY_YTD.Add IIf(cStatMonth >= 1, cumulPY, Empty), CStr(n)
+                .CA_TY_YTD.Add IIF(cStatMonth >= n, cumulTY, Empty), CStr(n)
+                .CA_PY_YTD.Add IIF(cStatMonth >= 1, cumulPY, Empty), CStr(n)
                                 
             Next n
         
@@ -161,7 +165,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     End Sub
 
     Public Function FilterByKeyRep(str As String) As clsClients
-    Dim clnts As clsClients, clnt As clsClientInfo
+    Dim clnts As clsClients, clnt As clsClient
     Set clnts = New clsClients
 
     For Each clnt In Me
