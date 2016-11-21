@@ -64,7 +64,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
     diag.Configure "Upload data", "Now wasting your time...", cFirstRow, end_f
     diag.Show
     
-    statusKPI = IIF(wks.Cells(2, 33) = "KPI", True, False)
+    statusKPI = IIf(wks.Cells(2, 33) = "KPI", True, False)
     
     For f_i = cFirstRow To end_f
         sv = sv + 1
@@ -99,7 +99,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .ClientName = myLib.GetClientName(.Client, .ClientAddres, .GeoCity)
             .ChainName = wks.Cells(f_i, 19)
             .ChainCode = myLib.GetNum2numNull(Cells(f_i, 20))
-            .ChainNameTop = IIF(Left(.ChainCode, 2) = "93", .ChainName, Empty)
+            .ChainNameTop = IIf(Left(.ChainCode, 2) = "93", .ChainName, Empty)
             .GeoReg = wks.Cells(f_i, 13)
             .ClientType = wks.Cells(f_i, 18)
             .ClientTypeRus = myLib.GetClntType(.ClientType, 1)
@@ -121,7 +121,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .MagTypePrice = myLib.GetMag(.MagMinPrice, .MagMaxPrice, .HairDressersPlaces, .TypeBusiness)
             .MagTypePlace = myLib.GetMag(.MagMinPrice, .MagMaxPrice, .HairDressersPlaces, "place")
             .Mag = .MagTypePrice & .MagTypePlace
-            .MagType = IIF(Len(.Mag) = 2, .Mag, Empty)
+            .MagType = IIf(Len(.Mag) = 2, .Mag, Empty)
             .WorkStatusNum = wks.Cells(f_i, 8)
             .WorkStatusName = myLib.GetTypeDN(.WorkStatusNum)
             .ClientEcadCode = wks.Cells(f_i, 29)
@@ -131,16 +131,17 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             .LtmAvgCaVal = myLib.GetLTM(wks, f_i, cStatMonth, "avg_ca")
             .LtmAvgCaName = myLib.GetLTM(wks, f_i, cStatMonth, "type_avg_ca")
             .LtmFrqOrders = myLib.GetLTM(wks, f_i, cStatMonth, "frqOrders")
+            .isLost = myLib.GetLTM(wks, f_i, cStatMonth, "LostLTM")
             .ClientEvVal = myLib.GetNum2num0(wks.Cells(f_i, 92))
             .ClientEvName = myLib.GetVectoreEV(.ClientEvVal)
             .MastersEducatedAllY = myLib.GetNum2numNull(wks.Cells(f_i, 30))
             .MastersEducatedPY = myLib.GetNum2numNull(wks.Cells(f_i, 31))
             .MastersEducatedTY = myLib.GetNum2numNull(wks.Cells(f_i, 32))
-            .key_srep = .BrandName & .cdDateStat & .SrepName
+            .key_srep = .BrandName & .cdDateStat & LCase(Trim(.SrepName))
             
-            .OrdersSLN = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 33), 0))
-            .OrdersPhone = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 34), 0))
-            .Visits2Act = myLib.GetNum2num0(IIF(statusKPI = True, wks.Cells(f_i, 35), 0))
+            .OrdersSLN = myLib.GetNum2num0(IIf(statusKPI = True, wks.Cells(f_i, 33), 0))
+            .OrdersPhone = myLib.GetNum2num0(IIf(statusKPI = True, wks.Cells(f_i, 34), 0))
+            .Visits2Act = myLib.GetNum2num0(IIf(statusKPI = True, wks.Cells(f_i, 35), 0))
  
             
            
@@ -148,12 +149,12 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
             cumulPY = Empty
             For n = 1 To 12
            
-                .CA_TY_M.Add IIF(cStatMonth >= n, CLng(wks.Cells(f_i, clmTYLor + n - 1)), Empty), CStr(n)
-                .CA_PY_M.Add IIF(cStatMonth >= 1, CLng(wks.Cells(f_i, clmPYLor + n - 1)), Empty), CStr(n)
+                .CA_TY_M.Add IIf(cStatMonth >= n, CLng(wks.Cells(f_i, clmTYLor + n - 1)), Empty), CStr(n)
+                .CA_PY_M.Add IIf(cStatMonth >= 1, CLng(wks.Cells(f_i, clmPYLor + n - 1)), Empty), CStr(n)
                     cumulTY = cumulTY + .CA_TY_M.Item(n)
                     cumulPY = cumulPY + .CA_PY_M.Item(n)
-                .CA_TY_YTD.Add IIF(cStatMonth >= n, cumulTY, Empty), CStr(n)
-                .CA_PY_YTD.Add IIF(cStatMonth >= 1, cumulPY, Empty), CStr(n)
+                .CA_TY_YTD.Add IIf(cStatMonth >= n, cumulTY, Empty), CStr(n)
+                .CA_PY_YTD.Add IIf(cStatMonth >= 1, cumulPY, Empty), CStr(n)
                                 
             Next n
         

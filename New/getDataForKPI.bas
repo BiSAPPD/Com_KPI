@@ -32,7 +32,7 @@ nm_ActWb = ActiveWorkbook.name
 cd_ActualMonth = CInt(InputBox("Month"))
 cd_ActualYear = CInt(InputBox("YearEnd"))
 
-ar_brand = Array("KR")
+ar_brand = Array("LP", "MX", "KR", "RD", "ES")
 myLib.VBA_Start
 
 
@@ -113,7 +113,7 @@ For Each usr In users.dic_People.Items
     VisitedAct = 0
     status_kpi = 0
 
-    key_srep = usr.BrandStat & usr.cdDateStat & usr.PersonName
+    key_srep = usr.BrandStat & usr.cdDateStat & LCase(Trim(usr.PersonName))
     For Each clnt In clnts.FilterByKeyRep(key_srep)
         i = i + 1
         tempArray(i, clm_first) = i
@@ -123,7 +123,7 @@ For Each usr In users.dic_People.Items
 
             n = n + 1: tempArray(i, n) = .BrandName:                     myLib.letHead hh, n, "BrandName": tempArray(strt_i, n) = .BrandName
             n = n + 1: tempArray(i, n) = .cdDateStat:                    myLib.letHead hh, n, "StatYear": tempArray(strt_i, n) = .cdDateStat
-            n = n + 1: tempArray(i, n) = "":                             myLib.letHead hh, n, "StatMonth": tempArray(strt_i, n) = ""
+            n = n + 1: tempArray(i, n) = .DatabaseClientNum:                             myLib.letHead hh, n, "StatMonth": tempArray(strt_i, n) = ""
             n = n + 1: tempArray(i, n) = .UniverseCode:                  myLib.letHead hh, n, "UniverseCode"
             n = n + 1: tempArray(i, n) = .ExtMregName:                   myLib.letHead hh, n, "ExtMregName": tempArray(strt_i, n) = .ExtMregName
             n = n + 1: tempArray(i, n) = .RegName:                       myLib.letHead hh, n, "RegName": tempArray(strt_i, n) = .RegName
@@ -147,22 +147,32 @@ For Each usr In users.dic_People.Items
             n = n + 1: tempArray(i, n) = .HairdressersNum:               myLib.letHead hh, n, "HairdressersNum"
             n = n + 1: tempArray(i, n) = .HairdressersWorkPlace:         myLib.letHead hh, n, "HairdressersWorkPlace"
                
-            n = n + 1: tempArray(i, n) = IIF(.CA_PY_YTD.Item(12) <> 0, 1, Empty):                                               myLib.letHead hh, n, "DN_PY_T"
-            n = n + 1: tempArray(i, n) = IIF(.CA_TY_YTD.Item(month(.cdDateStat)) <> 0, 1, Empty):                               myLib.letHead hh, n, "DN_YTD"
-            n = n + 1: tempArray(i, n) = IIF(.CA_TY_M.Item(month(.cdDateStat)) <> 0, 1, Empty):                                 myLib.letHead hh, n, "DN_TY_M"
-            n = n + 1: tempArray(i, n) = IIF(.CA_TY_YTD.Item(month(.cdDateStat)) <> 0 And .CnqYearGA <> "CNQ_TY", 1, Empty):    myLib.letHead hh, n, "DN_TY_YTD_CPS"
-            n = n + 1: tempArray(i, n) = IIF(.CA_TY_M.Item(month(.cdDateStat)) <> 0 And .CnqYearGA <> "CNQ_TY", 1, Empty):      myLib.letHead hh, n, "DN_TY_M_CPS"
+            n = n + 1: tempArray(i, n) = IIf(.CA_PY_YTD.Item(12) <> 0, 1, Empty):                                               myLib.letHead hh, n, "DN_PY_T"
+            n = n + 1: tempArray(i, n) = IIf(.CA_TY_YTD.Item(month(.cdDateStat)) <> 0, 1, Empty):                               myLib.letHead hh, n, "DN_YTD"
+            n = n + 1: tempArray(i, n) = IIf(.CA_TY_M.Item(month(.cdDateStat)) <> 0, 1, Empty):                                 myLib.letHead hh, n, "DN_TY_M"
+            n = n + 1: tempArray(i, n) = IIf(.CA_TY_YTD.Item(month(.cdDateStat)) <> 0 And .CnqYearGA <> "CNQ_TY", 1, Empty):    myLib.letHead hh, n, "DN_TY_YTD_CPS"
+            n = n + 1: tempArray(i, n) = IIf(.CA_TY_M.Item(month(.cdDateStat)) <> 0 And .CnqYearGA <> "CNQ_TY", 1, Empty):      myLib.letHead hh, n, "DN_TY_M_CPS"
             n = n + 1: tempArray(i, n) = myLib.getNumInThrousend(.CA_TY_M.Item(month(.cdDateStat))):                            myLib.letHead hh, n, "CA_TY_M"
             n = n + 1: tempArray(i, n) = myLib.getNumInThrousend(.CA_PY_M.Item(month(.cdDateStat))):                            myLib.letHead hh, n, "CA_PY_M"
             n = n + 1: tempArray(i, n) = myLib.getNumInThrousend(.CA_TY_YTD.Item(month(.cdDateStat))):                          myLib.letHead hh, n, "CA_TY_YTD"
             n = n + 1: tempArray(i, n) = myLib.getNumInThrousend(.CA_PY_YTD.Item(month(.cdDateStat))):                          myLib.letHead hh, n, "CA_PY_YTD"
-            ' = n + 1: Cells(i , n) = .isClosed:                                                                                myLib.letHead hh, n, "LostClientsLTM"
-            n = n + 1: tempArray(i, n) = "":                                                                                    myLib.letHead hh, n, "WinClientsLTM"
+            n = n + 1: tempArray(i, n) = IIf(.cdDateStat = .CnqFullDate, myLib.getNumInThrousend(.CA_TY_M.Item(month(.cdDateStat))), 0):    myLib.letHead hh, n, "CA_1Order_TY_M"
+            
+            n = n + 1: tempArray(i, n) = .isLost:                                                                               myLib.letHead hh, n, "LostClientsLTM"
+            n = n + 1: tempArray(i, n) = IIf(.CnqFullDate > DateAdd("m", -12, .cdDateStat), 1, 0):                                                                                     myLib.letHead hh, n, "WinClientsLTM"
+            n = n + 1: tempArray(i, n) = IIf(.cdDateStat = .CnqFullDate, 1, 0):                                                 myLib.letHead hh, n, "DN_CNQ_TY_M"
+            n = n + 1: tempArray(i, n) = IIf(DateAdd("m", -12, .cdDateStat) = .CnqFullDate, 1, 0):                              myLib.letHead hh, n, "DN_CNQ_PY_M"
+            n = n + 1: tempArray(i, n) = IIf(.CnqFullDate >= DateSerial(Year(.cdDateStat), 1, 1) And .CnqFullDate <= DateSerial(Year(.cdDateStat), month(.cdDateStat), 1), 1, 0): myLib.letHead hh, n, "DN_CNQ_TY_YTD"
+            If month(.cdDateStat) = 3 Then
+            x = DateSerial(Year(.cdDateStat) - 1, 1, 1)
+            xx = DateSerial(Year(.cdDateStat) - 1, month(.cdDateStat), 1)
+            End If
+            n = n + 1: tempArray(i, n) = IIf(.CnqFullDate >= DateSerial(Year(.cdDateStat) - 1, 1, 1) And .CnqFullDate <= DateSerial(Year(.cdDateStat) - 1, month(.cdDateStat), 1), 1, 0): myLib.letHead hh, n, "DN_CNQ_PY_YTD"
             n = n + 1: tempArray(i, n) = .OrdersSLN:        myLib.letHead hh, n, "OrdersSLN": sum_OrdersSLN = sum_OrdersSLN + .OrdersSLN: clm_orfdersInSLN = n
             n = n + 1: tempArray(i, n) = .OrdersPhone:      myLib.letHead hh, n, "OrdersPhone": sum_OrdersPhone = sum_OrdersPhone + .OrdersPhone: clm_orderByPhone = n
             n = n + 1: tempArray(i, n) = .Visits2Act:       myLib.letHead hh, n, "Visits2Act": sum_Visits2Act = sum_Visits2Act + .Visits2Act: clm_visit2act = n
 
-                numVisitedAct = IIF(.Visits2Act <> 0, 1, 0)
+                numVisitedAct = IIf(.Visits2Act <> 0, 1, 0)
             n = n + 1: tempArray(i, n) = numVisitedAct: myLib.letHead hh, n, "VisitedAct": sum_VisitedAct = sum_VisitedAct + numVisitedAct: clm_numVisitedAct = n
 
   
@@ -171,27 +181,27 @@ For Each usr In users.dic_People.Items
     Next
     If kpis.dic_KPI.Exists(key_srep) Then
         With kpis.dic_KPI.Item(key_srep)
-            status_kpi = status_kpi + IIF(sum_OrdersSLN + .OrdersSLN = 0, 0, 1)
-            tempArray(strt_i, clm_orfdersInSLN) = IIF(sum_OrdersSLN = 0, .OrdersSLN, 0)
+            status_kpi = status_kpi + IIf(sum_OrdersSLN + .OrdersSLN = 0, 0, 1)
+            tempArray(strt_i, clm_orfdersInSLN) = IIf(sum_OrdersSLN = 0, .OrdersSLN, 0)
             
-            status_kpi = status_kpi + IIF(sum_OrdersPhone + .OrdersPhone = 0, 0, 1)
-            tempArray(strt_i, clm_orderByPhone) = IIF(sum_OrdersPhone = 0, .OrdersPhone, 0)
+            status_kpi = status_kpi + IIf(sum_OrdersPhone + .OrdersPhone = 0, 0, 1)
+            tempArray(strt_i, clm_orderByPhone) = IIf(sum_OrdersPhone = 0, .OrdersPhone, 0)
             
-            status_kpi = status_kpi + IIF(sum_Visits2Act + .Visits2Act = 0, 0, 1)
-            tempArray(strt_i, clm_visit2act) = IIF(sum_Visits2Act = 0, .Visits2Act, 0)
+            status_kpi = status_kpi + IIf(sum_Visits2Act + .Visits2Act = 0, 0, 1)
+            tempArray(strt_i, clm_visit2act) = IIf(sum_Visits2Act = 0, .Visits2Act, 0)
             
-            status_kpi = status_kpi + IIF(sum_VisitedAct + .VisitedAct = 0, 0, 1)
-            tempArray(strt_i, clm_numVisitedAct) = IIF(sum_VisitedAct = 0, .VisitedAct, 0)
+            status_kpi = status_kpi + IIf(sum_VisitedAct + .VisitedAct = 0, 0, 1)
+            tempArray(strt_i, clm_numVisitedAct) = IIf(sum_VisitedAct = 0, .VisitedAct, 0)
                    
-            status_kpi = status_kpi + IIF(.OrdersSLN = 0, 0, 1)
-            n = n + 1: tempArray(strt_i, n) = .OrdersSLN:       myLib.letHead hh, n, "Visits2cnq"
+            status_kpi = status_kpi + IIf(.Visits2cnq = 0, 0, 1)
+            n = n + 1: tempArray(strt_i, n) = .Visits2cnq:       myLib.letHead hh, n, "Visits2cnq"
             
-            status_kpi = status_kpi + IIF(.OrdersPhone = 0, 0, 1)
-            n = n + 1: tempArray(strt_i, n) = .OrdersPhone:       myLib.letHead hh, n, "VisitedCnq"
+            status_kpi = status_kpi + IIf(.VisitedCnq = 0, 0, 1)
+            n = n + 1: tempArray(strt_i, n) = .VisitedCnq:       myLib.letHead hh, n, "VisitedCnq"
             
             n = n + 1: tempArray(strt_i, n) = .TargetCA:       myLib.letHead hh, n, "TargetCA"
             
-            n = n + 1: tempArray(strt_i, n) = IIF(.WDays = 0, 20, .WDays):         myLib.letHead hh, n, "WDays"
+            n = n + 1: tempArray(strt_i, n) = IIf(.WDays = 0, 20, .WDays):         myLib.letHead hh, n, "WDays"
             n = n + 1: tempArray(strt_i, n) = status_kpi:  myLib.letHead hh, n, "StatusDataKPI": clm_status_kpi = n
         End With
     End If

@@ -48,7 +48,7 @@ Public Sub FillFromSheet(ByRef wks As Worksheet, ByVal cStatYear As Integer, ByV
         nm_FLSM = Trim(Cells(f_rw, cFlsm))
         nm_vacancy_status = myLib.GetSREP_type(nm_Srep, nm_FLSM)
         
-        keyUser = cStatYear & cStatMonth & cBrand & nm_Srep
+        keyUser = cStatYear & cStatMonth & cBrand & LCase(Trim(nm_Srep))
         
         If Not dic_People.Exists(keyUser) And Len(nm_Srep) > 0 Then
             Set obj = New clsUser
